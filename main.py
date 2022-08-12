@@ -23,7 +23,35 @@ def assemble_rbg(img_r, img_g, img_b):
                            np.reshape(img_b, shape)), axis=2)
 
 
+# Transformations
 
+def reduce(img, factor):
+    result = np.zeros((img.shape[0] // factor, img.shape[1] // factor))
+    for i in range(result.shape[0]):
+        for j in range(result.shape[1]):
+            result[i, j] = np.mean(img[i * factor:(i + 1) * factor, j * factor:(j + 1) * factor])
+    return result
+
+
+def rotate(img, angle):
+    return ndimage.rotate(img, angle, reshape=False)
+
+
+def flip(img, direction):
+    return img[::direction, :]
+
+
+def apply_transformation(img, direction, angle, contrast=1.0, brightness=0.0):
+    return contrast * rotate(flip(img, direction), angle) + brightness
+
+
+# Contrast and brightness
+
+def find_contrast_and_brightness1(D, S):
+    # Fix the contrast and only fit the brightness
+    contrast = 0.75
+    brightness = (np.sum(D - contrast * S)) / D.size
+    return contrast, brightness
 
 
 def find_contrast_and_brightness2(D, S):
